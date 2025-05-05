@@ -3,8 +3,8 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
-import { Typography, Card, Tooltip as AntTooltip } from "antd";
-import type { Grammar, Error as GrammarError, Correction } from "../types";
+import { Typography } from "antd";
+import type { Grammar, Error as GrammarError } from "../types";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -24,7 +24,11 @@ const processHighlightedText = (results: Grammar) => {
   ];
 
   if (!results.corrected_text || allErrors.length === 0) {
-    return <pre className="whitespace-pre-wrap text-gray-800">{results.corrected_text}</pre>;
+    return (
+      <pre className="whitespace-pre-wrap text-gray-800">
+        {results.corrected_text}
+      </pre>
+    );
   }
 
   // Create a map of corrected text segments and their original errors
@@ -46,7 +50,9 @@ const processHighlightedText = (results: Grammar) => {
         // Add the text before the correction
         if (correctedParts[i].length > 0) {
           segments.push(
-            <span key={`text-${segments.length}`} className="text-gray-800">{correctedParts[i]}</span>
+            <span key={`text-${segments.length}`} className="text-gray-800">
+              {correctedParts[i]}
+            </span>
           );
         }
 
@@ -79,10 +85,18 @@ const processHighlightedText = (results: Grammar) => {
 
   // Add any remaining text
   if (remainingText.length > 0) {
-    segments.push(<span key={`text-${segments.length}`} className="text-gray-800">{remainingText}</span>);
+    segments.push(
+      <span key={`text-${segments.length}`} className="text-gray-800">
+        {remainingText}
+      </span>
+    );
   }
 
-  return <pre className="whitespace-pre-wrap bg-white p-4 rounded-xl border border-gray-100">{segments}</pre>;
+  return (
+    <pre className="whitespace-pre-wrap bg-white p-4 rounded-xl border border-gray-100">
+      {segments}
+    </pre>
+  );
 };
 
 const GrammarResults: React.FC<GrammarResultsProps> = ({ results }) => {
@@ -201,7 +215,9 @@ const GrammarResults: React.FC<GrammarResultsProps> = ({ results }) => {
             </h5>
           </div>
           <div className="p-4 bg-white">
-            <p className="text-gray-500 mb-0">No {title.toLowerCase()} errors found.</p>
+            <p className="text-gray-500 mb-0">
+              No {title.toLowerCase()} errors found.
+            </p>
           </div>
         </div>
       );
@@ -274,10 +290,15 @@ const GrammarResults: React.FC<GrammarResultsProps> = ({ results }) => {
         </div>
       </div>
 
-      <div ref={chartRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div
+        ref={chartRef}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+      >
         <div className="md:col-span-1 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
           <div className="text-center mb-4">
-            <h4 className="text-lg font-semibold text-gray-800">Error Summary</h4>
+            <h4 className="text-lg font-semibold text-gray-800">
+              Error Summary
+            </h4>
           </div>
           <div style={{ maxWidth: "300px", margin: "0 auto" }}>
             <Pie
@@ -299,11 +320,12 @@ const GrammarResults: React.FC<GrammarResultsProps> = ({ results }) => {
                       label: function (context) {
                         const label = context.label || "";
                         const value = context.raw as number;
-                        const total = (context.chart.data.datasets[0].data as number[]).reduce(
-                          (a, b) => (a as number) + (b as number),
-                          0
-                        );
-                        const percentage = total ? Math.round((value / total) * 100) : 0;
+                        const total = (
+                          context.chart.data.datasets[0].data as number[]
+                        ).reduce((a, b) => (a as number) + (b as number), 0);
+                        const percentage = total
+                          ? Math.round((value / total) * 100)
+                          : 0;
                         return `${label}: ${value} (${percentage}%)`;
                       },
                     },
@@ -343,30 +365,20 @@ const GrammarResults: React.FC<GrammarResultsProps> = ({ results }) => {
 
           {activeTab === "errors" ? (
             <div className="space-y-1">
-              {renderErrorCategory(
-                results.spelling,
-                "Spelling",
-                "bg-red-500"
-              )}
+              {renderErrorCategory(results.spelling, "Spelling", "bg-red-500")}
               {renderErrorCategory(
                 results.punctuation,
                 "Punctuation",
                 "bg-blue-500"
               )}
-              {renderErrorCategory(
-                results.grammar,
-                "Grammar",
-                "bg-yellow-500"
-              )}
+              {renderErrorCategory(results.grammar, "Grammar", "bg-yellow-500")}
             </div>
           ) : (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-4 bg-primary-700 text-white">
                 <h5 className="m-0 font-medium">Corrected Text</h5>
               </div>
-              <div className="p-0">
-                {processHighlightedText(results)}
-              </div>
+              <div className="p-0">{processHighlightedText(results)}</div>
             </div>
           )}
         </div>
