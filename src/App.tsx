@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Layout, Typography, Alert, ConfigProvider, Card } from "antd";
 import GrammarForm from "./components/GrammarForm";
 import GrammarResults from "./components/GrammarResults";
-import { Grammar } from "./types";
+import RewriteResults from "./components/RewriteResults";
+import { Grammar, RewriteResponse } from "./types";
 import { grammarApi } from "./services/api";
 import { AxiosError } from "axios";
 import theme from "./theme";
@@ -13,10 +14,14 @@ const { Title, Paragraph } = Typography;
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [results, setResults] = useState<Grammar | null>(null);
+  const [rewriteResults, setRewriteResults] = useState<RewriteResponse | null>(null);
   const [activeTab, setActiveTab] = useState<string>("text");
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (data: FormData | { text: string; proper_nouns: string }, tab: string) => {
+  const handleSubmit = async (
+    data: FormData | { text: string; proper_nouns: string } | { text: string; requirement?: string; english_level?: string }, 
+    tab: string
+  ) => {
     setLoading(true);
     setError(null);
     
@@ -25,12 +30,21 @@ const App: React.FC = () => {
         const textData = data as { text: string; proper_nouns: string };
         const response = await grammarApi.checkText(textData);
         setResults(response);
+        setRewriteResults(null);
+        setActiveTab('result');
+      } else if (tab === 'rewrite') {
+        const rewriteData = data as { text: string; requirement?: string; english_level?: string };
+        const response = await grammarApi.rewriteText(rewriteData);
+        setRewriteResults(response);
+        setResults(null);
+        setActiveTab('result');
       } else {
         const formData = data as FormData;
         const response = await grammarApi.checkFile(formData);
         setResults(response);
+        setRewriteResults(null);
+        setActiveTab('result');
       }
-      setActiveTab('result');
     } catch (error) {
       console.error('Error:', error);
       
@@ -39,7 +53,7 @@ const App: React.FC = () => {
         const errorMessage = error.response?.data?.detail || error.message;
         setError(errorMessage);
       } else {
-        setError("An error occurred while checking grammar.");
+        setError("An error occurred while processing the request.");
       }
     } finally {
       setLoading(false);
@@ -88,6 +102,15 @@ const App: React.FC = () => {
               bodyStyle={{ padding: '28px' }}
             >
               <GrammarResults results={results} />
+            </Card>
+          )}
+
+          {rewriteResults && (
+            <Card 
+              className="shadow-card hover:shadow-card-hover transition-shadow duration-300 rounded-xl overflow-hidden"
+              bodyStyle={{ padding: '28px' }}
+            >
+              <RewriteResults results={rewriteResults} />
             </Card>
           )}
         </Content>

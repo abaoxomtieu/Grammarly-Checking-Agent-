@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { Grammar } from '../types';
 
-// const API_BASE_URL = 'http://localhost:8080';
-const API_BASE_URL = 'https://abao77-grammarly-checking.hf.space';
+const API_BASE_URL = 'https://darkbreakerk-grammarly-checking.hf.space';
+// const API_BASE_URL = 'https://abao77-grammarly-checking.hf.space';
 
 export const grammarApi = {
   checkText: async (data: { text: string; proper_nouns: string }) => {
@@ -32,6 +32,11 @@ export const grammarApi = {
     const response = await axios.get(`${API_BASE_URL}/download/${filename}`, {
       responseType: 'blob',
     });
+    return response.data;
+  },
+  
+  rewriteText: async (data: { text: string; requirement?: string; english_level?: string }) => {
+    const response = await axios.post(`${API_BASE_URL}/rewrite`, data);
     return response.data;
   },
 };

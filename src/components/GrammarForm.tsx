@@ -1,14 +1,15 @@
 import React, { useState, KeyboardEvent } from "react";
-import { Tabs, Input, Button, message, Tooltip } from "antd";
+import { Tabs, Input, Button, message, Tooltip, Select } from "antd";
 import { LoadingOutlined, ClearOutlined, CopyOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import type { TabsProps } from "antd";
 import GrammarQuiz from "./GrammarQuiz";
 
 const { TextArea } = Input;
+const { Option } = Select;
 
 interface GrammarFormProps {
   onSubmit: (
-    data: FormData | { text: string; proper_nouns: string },
+    data: FormData | { text: string; proper_nouns: string } | { text: string; requirement?: string; english_level?: string },
     tab: string
   ) => Promise<void>;
   loading: boolean;
@@ -25,6 +26,9 @@ const GrammarForm: React.FC<GrammarFormProps> = ({
   const [text, setText] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [properNouns, setProperNouns] = useState<string>("");
+  const [rewriteText, setRewriteText] = useState<string>("");
+  const [requirement, setRequirement] = useState<string>("");
+  const [englishLevel, setEnglishLevel] = useState<string>("");
 
   const handleTextSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +51,31 @@ const GrammarForm: React.FC<GrammarFormProps> = ({
 
   const handleCopyText = () => {
     navigator.clipboard.writeText(text);
+    message.success("Text copied to clipboard");
+  };
+
+  const handleRewriteSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rewriteText.trim()) {
+      message.warning("Please enter some text to rewrite.");
+      return;
+    }
+
+    const payload = {
+      text: rewriteText.trim(),
+      requirement: requirement.trim() || undefined,
+      english_level: englishLevel || undefined,
+    };
+    onSubmit(payload, "rewrite");
+  };
+
+  const handleClearRewriteText = () => {
+    setRewriteText("");
+    message.info("Text cleared");
+  };
+
+  const handleCopyRewriteText = () => {
+    navigator.clipboard.writeText(rewriteText);
     message.success("Text copied to clipboard");
   };
 
@@ -180,6 +209,116 @@ const GrammarForm: React.FC<GrammarFormProps> = ({
       ),
     },
     {
+      key: "rewrite",
+      label: "Text Rewrite",
+      children: (
+        <form onSubmit={handleRewriteSubmit} className="space-y-8">
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Enter text to rewrite
+              </label>
+              <div className="flex space-x-2">
+                <Tooltip title="Copy text">
+                  <Button 
+                    type="text" 
+                    size="small" 
+                    icon={<CopyOutlined />} 
+                    onClick={handleCopyRewriteText} 
+                    disabled={!rewriteText}
+                    className="text-gray-500 hover:text-primary-600"
+                  />
+                </Tooltip>
+                <Tooltip title="Clear text">
+                  <Button 
+                    type="text" 
+                    size="small" 
+                    icon={<ClearOutlined />} 
+                    onClick={handleClearRewriteText} 
+                    disabled={!rewriteText}
+                    className="text-gray-500 hover:text-primary-600"
+                  />
+                </Tooltip>
+              </div>
+            </div>
+            <TextArea
+              rows={8}
+              value={rewriteText}
+              onChange={(e) => setRewriteText(e.target.value)}
+              placeholder="Enter or paste your text to rewrite and enhance..."
+              disabled={loading}
+              className="w-full rounded-xl border-gray-300 focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 transition-all"
+              autoSize={{ minRows: 8, maxRows: 12 }}
+            />
+          </div>
+
+          <div className="relative">
+            <div className="flex justify-between items-center mb-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                Specific Requirements
+                <Tooltip title="Add any specific requirements for how the text should be rewritten">
+                  <InfoCircleOutlined className="ml-1 text-gray-400" />
+                </Tooltip>
+              </label>
+              <span className="text-xs text-gray-500">Optional</span>
+            </div>
+            <Input
+              value={requirement}
+              onChange={(e) => setRequirement(e.target.value)}
+              placeholder="Enter specific requirements (e.g., make more formal, simplify, be more concise)"
+              disabled={loading}
+              className="w-full rounded-xl border-gray-300 focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 transition-all"
+            />
+            <p className="mt-1 text-sm text-gray-500">
+              If empty, the system will determine the best way to enhance the text.
+            </p>
+          </div>
+
+          <div className="relative">
+            <div className="flex justify-between items-center mb-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                English Level
+                <Tooltip title="Select your English proficiency level">
+                  <InfoCircleOutlined className="ml-1 text-gray-400" />
+                </Tooltip>
+              </label>
+              <span className="text-xs text-gray-500">Optional</span>
+            </div>
+            <Select
+              value={englishLevel}
+              onChange={(value) => setEnglishLevel(value)}
+              placeholder="Select your English level"
+              style={{ width: '100%' }}
+              disabled={loading}
+              className="w-full rounded-xl border-gray-300 focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 transition-all"
+            >
+              <Option value="">Auto-detect</Option>
+              <Option value="beginner">Beginner</Option>
+              <Option value="intermediate">Intermediate</Option>
+              <Option value="advanced">Advanced</Option>
+              <Option value="native">Native</Option>
+            </Select>
+            <p className="mt-1 text-sm text-gray-500">
+              If not selected, the system will auto-detect your level.
+            </p>
+          </div>
+
+          <div className="flex justify-center pt-2">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              disabled={!rewriteText.trim()}
+              className="h-12 px-8 text-base font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-300 w-full md:w-auto"
+              icon={loading ? <LoadingOutlined /> : undefined}
+            >
+              {loading ? "Rewriting..." : "Rewrite Text"}
+            </Button>
+          </div>
+        </form>
+      ),
+    },
+    {
       key: "file",
       label: "File Upload",
       children: (
@@ -251,8 +390,14 @@ const GrammarForm: React.FC<GrammarFormProps> = ({
     },
     {
       key: "quiz",
-      label: "Grammar Quiz",
+      label: "Quiz Mode",
       children: <GrammarQuiz />,
+    },
+    {
+      key: "result",
+      label: "Results",
+      disabled: true,
+      children: <div>Results will be displayed here after checking.</div>,
     },
   ];
 

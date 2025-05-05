@@ -19,3 +19,13 @@ export interface Correction {
   corrected?: string;
   explanation?: string;
 }
+
+export interface RewriteResponse {
+  rewritten_text: string;
+}
+
+export interface RewriteRequest {
+  text: string;
+  requirement?: string;
+  english_level?: string;
+}
