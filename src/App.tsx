@@ -3,7 +3,7 @@ import { Layout, Typography, Alert, ConfigProvider, Card } from "antd";
 import GrammarForm from "./components/GrammarForm";
 import GrammarResults from "./components/GrammarResults";
 import RewriteResults from "./components/RewriteResults";
-import { Grammar, RewriteResponse } from "./types";
+import { Grammar } from "./types";
 import { grammarApi } from "./services/api";
 import { AxiosError } from "axios";
 import theme from "./theme";
