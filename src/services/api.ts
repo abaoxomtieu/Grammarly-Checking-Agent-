@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Grammar } from '../types';
 
-const API_BASE_URL = 'https://darkbreakerk-grammarly-checking.hf.space';
+const API_BASE_URL = 'http://127.0.0.1:8080';
 // const API_BASE_URL = 'https://abao77-grammarly-checking.hf.space';
 
 export const grammarApi = {
@@ -16,6 +16,7 @@ export const grammarApi = {
         'Content-Type': 'multipart/form-data',
       },
     });
+    console.log(response.data);
     return response.data as Grammar;
   },
 
@@ -37,7 +38,8 @@ export const grammarApi = {
   
   rewriteText: async (data: { text: string; requirement?: string; english_level?: string }) => {
     const response = await axios.post(`${API_BASE_URL}/rewrite`, data);
-    return response.data;
+    console.log(response.data);
+    return response.data.enhanced_text;
   },
 };
 

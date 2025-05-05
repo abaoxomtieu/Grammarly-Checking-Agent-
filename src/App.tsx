@@ -14,7 +14,7 @@ const { Title, Paragraph } = Typography;
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [results, setResults] = useState<Grammar | null>(null);
-  const [rewriteResults, setRewriteResults] = useState<RewriteResponse | null>(null);
+  const [rewriteResults, setRewriteResults] = useState<string>("");
   const [activeTab, setActiveTab] = useState<string>("text");
   const [error, setError] = useState<string | null>(null);
 
@@ -30,11 +30,12 @@ const App: React.FC = () => {
         const textData = data as { text: string; proper_nouns: string };
         const response = await grammarApi.checkText(textData);
         setResults(response);
-        setRewriteResults(null);
+        setRewriteResults("null");
         setActiveTab('result');
       } else if (tab === 'rewrite') {
         const rewriteData = data as { text: string; requirement?: string; english_level?: string };
         const response = await grammarApi.rewriteText(rewriteData);
+        console.log(response);
         setRewriteResults(response);
         setResults(null);
         setActiveTab('result');
@@ -42,7 +43,7 @@ const App: React.FC = () => {
         const formData = data as FormData;
         const response = await grammarApi.checkFile(formData);
         setResults(response);
-        setRewriteResults(null);
+        setRewriteResults("");
         setActiveTab('result');
       }
     } catch (error) {

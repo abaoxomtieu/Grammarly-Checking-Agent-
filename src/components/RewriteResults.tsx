@@ -1,16 +1,15 @@
 import React from 'react';
 import { Typography, Button, message } from 'antd';
-import { RewriteResponse } from '../types';
 
 const { Title, Text } = Typography;
 
 interface RewriteResultsProps {
-  results: RewriteResponse;
+  results: string;
 }
 
 const RewriteResults: React.FC<RewriteResultsProps> = ({ results }) => {
   const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(results.rewritten_text);
+    navigator.clipboard.writeText(results);
     message.success('Rewritten text copied to clipboard');
   };
 
@@ -21,7 +20,7 @@ const RewriteResults: React.FC<RewriteResultsProps> = ({ results }) => {
           Rewritten Text
         </Title>
         <div className="bg-gray-50 p-5 rounded-lg border border-gray-200 whitespace-pre-wrap">
-          <Text>{results.rewritten_text}</Text>
+          <Text>{results}</Text>
         </div>
       </div>
       <div className="flex justify-end">
