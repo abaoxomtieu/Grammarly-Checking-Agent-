@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Grammar } from '../types';
 
-const API_BASE_URL = 'http://127.0.0.1:8080';
+const API_BASE_URL = 'https://darkbreakerk-grammarly-checking.hf.space';
 // const API_BASE_URL = 'https://abao77-grammarly-checking.hf.space';
 
 export const grammarApi = {
