@@ -82,7 +82,7 @@ const processHighlightedText = (results: Grammar) => {
     segments.push(<span key={`text-${segments.length}`} className="text-gray-800">{remainingText}</span>);
   }
 
-  return <pre className="whitespace-pre-wrap bg-white p-4 rounded">{segments}</pre>;
+  return <pre className="whitespace-pre-wrap bg-white p-4 rounded-xl border border-gray-100">{segments}</pre>;
 };
 
 const GrammarResults: React.FC<GrammarResultsProps> = ({ results }) => {
@@ -111,9 +111,9 @@ const GrammarResults: React.FC<GrammarResultsProps> = ({ results }) => {
           results.grammar.length,
         ],
         backgroundColor: [
-          "rgba(255, 99, 132, 0.6)",
-          "rgba(54, 162, 235, 0.6)",
-          "rgba(255, 206, 86, 0.6)",
+          "rgba(255, 99, 132, 0.7)",
+          "rgba(54, 162, 235, 0.7)",
+          "rgba(255, 206, 86, 0.7)",
         ],
         borderColor: [
           "rgba(255, 99, 132, 1)",
@@ -191,64 +191,55 @@ const GrammarResults: React.FC<GrammarResultsProps> = ({ results }) => {
   ) => {
     if (errors.length === 0) {
       return (
-        <div className="mb-3 rounded-lg overflow-hidden shadow-md error-card">
-          <div className={`${bgColorClass} p-3`}>
-            <h5 className="mb-0 flex items-center">
+        <div className="mb-4 rounded-xl overflow-hidden shadow-sm error-card border border-gray-100">
+          <div className={`${bgColorClass} p-4`}>
+            <h5 className="mb-0 flex items-center text-white font-medium">
               {title}{" "}
-              <span className="ml-2 px-2 py-1 text-xs font-semibold bg-white text-gray-800 rounded-full">
+              <span className="ml-2 px-2 py-1 text-xs font-semibold bg-white bg-opacity-20 text-white rounded-full">
                 {errors.length}
               </span>
             </h5>
           </div>
           <div className="p-4 bg-white">
-            <p className="text-gray-500">
-              No {title.toLowerCase()} errors detected.
-            </p>
+            <p className="text-gray-500 mb-0">No {title.toLowerCase()} errors found.</p>
           </div>
         </div>
       );
     }
 
     return (
-      <div className="mb-3 rounded-lg overflow-hidden shadow-md error-card">
-        <div className={`${bgColorClass} p-3`}>
-          <h5 className="mb-0 flex items-center">
+      <div className="mb-4 rounded-xl overflow-hidden shadow-sm error-card border border-gray-100">
+        <div className={`${bgColorClass} p-4`}>
+          <h5 className="mb-0 flex items-center text-white font-medium">
             {title}{" "}
-            <span className="ml-2 px-2 py-1 text-xs font-semibold bg-white text-gray-800 rounded-full">
+            <span className="ml-2 px-2 py-1 text-xs font-semibold bg-white bg-opacity-20 text-white rounded-full">
               {errors.length}
             </span>
           </h5>
         </div>
-        <div className="p-4 bg-white">
+        <div className="bg-white">
           {errors.map((error, index) => (
-            <div key={index} className="mb-4 last:mb-0">
-              <div className="flex gap-2 mb-2">
-                <span className="px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded">
-                  Before
-                </span>
-                <div className="border border-red-300 rounded px-2 py-1 flex-grow">
-                  {error.before}
+            <div
+              key={index}
+              className="p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-1">
+                  <div className="text-sm text-gray-500 mb-1">Original:</div>
+                  <div className="p-2 bg-red-50 rounded text-red-800 border border-red-100">
+                    {error.before}
+                  </div>
                 </div>
-              </div>
-              <div className="flex gap-2 mb-2">
-                <span className="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded">
-                  After
-                </span>
-                <div className="group relative">
-                  <div className="border border-green-300 rounded px-2 py-1 flex-grow hover:bg-green-50 cursor-help highlight-animation">
+                <div className="md:col-span-1">
+                  <div className="text-sm text-gray-500 mb-1">Corrected:</div>
+                  <div className="p-2 bg-green-50 rounded text-green-800 border border-green-100">
                     {error.after}
                   </div>
-                  <div className="tooltip-custom absolute bottom-full left-0 mb-2 w-64 p-2 bg-white text-gray-800 rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible z-10 border border-gray-200">
-                    <div className="text-left">
-                      <strong>Error:</strong> {error.before}
-                      <br />
-                      <strong>Explanation:</strong> {error.explanation}
-                    </div>
-                  </div>
                 </div>
-              </div>
-              <div className="text-sm text-gray-500 mt-1">
-                <strong>Explanation:</strong> {error.explanation}
+                <div className="md:col-span-1">
+                  <div className="text-sm text-gray-500 mb-1">Explanation:</div>
+                  <div className="text-gray-700">{error.explanation}</div>
+                </div>
               </div>
             </div>
           ))}
@@ -258,155 +249,127 @@ const GrammarResults: React.FC<GrammarResultsProps> = ({ results }) => {
   };
 
   return (
-    <div ref={chartRef} className="space-y-6">
-      <div className="flex justify-between items-center mb-4">
-        <Title level={3} className="!mb-0">
-          Results
-        </Title>
-        <button
-          className="download-button px-3 py-1 text-sm border border-gray-300 rounded hover:bg-blue-700 hover:text-white transition-colors"
-          onClick={handleDownload}
-        >
-          <FontAwesomeIcon icon={faDownload} className="mr-2" />
-          Download Report
-        </button>
+    <div>
+      <div className="flex flex-col md:flex-row justify-between items-start mb-6">
+        <div>
+          <Title level={3} className="text-2xl font-bold mb-2 text-gray-800">
+            Grammar Check Results
+          </Title>
+          <Text className="text-gray-600">
+            {totalErrors === 0
+              ? "No errors found! Your text looks perfect."
+              : `Found ${totalErrors} ${
+                  totalErrors === 1 ? "issue" : "issues"
+                } to correct.`}
+          </Text>
+        </div>
+        <div className="flex mt-4 md:mt-0">
+          <button
+            onClick={handleDownload}
+            className="flex items-center text-primary-600 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors px-4 py-2 rounded-lg text-sm font-medium"
+          >
+            <FontAwesomeIcon icon={faDownload} className="mr-2" />
+            Download Report
+          </button>
+        </div>
       </div>
 
-      {totalErrors > 0 && (
-        <div className="w-64 h-64 mx-auto mb-6">
-          <Pie data={chartData} />
+      <div ref={chartRef} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="md:col-span-1 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+          <div className="text-center mb-4">
+            <h4 className="text-lg font-semibold text-gray-800">Error Summary</h4>
+          </div>
+          <div style={{ maxWidth: "300px", margin: "0 auto" }}>
+            <Pie
+              data={chartData}
+              options={{
+                plugins: {
+                  legend: {
+                    position: "bottom",
+                    labels: {
+                      padding: 20,
+                      boxWidth: 12,
+                    },
+                  },
+                  tooltip: {
+                    bodyFont: {
+                      size: 14,
+                    },
+                    callbacks: {
+                      label: function (context) {
+                        const label = context.label || "";
+                        const value = context.raw as number;
+                        const total = (context.chart.data.datasets[0].data as number[]).reduce(
+                          (a, b) => (a as number) + (b as number),
+                          0
+                        );
+                        const percentage = total ? Math.round((value / total) * 100) : 0;
+                        return `${label}: ${value} (${percentage}%)`;
+                      },
+                    },
+                  },
+                },
+                animation: {
+                  animateScale: true,
+                },
+              }}
+            />
+          </div>
         </div>
-      )}
 
-      {(results as any).corrections &&
-        (results as any).corrections.length > 0 && (
-          <Card className="mb-6">
-            <div className="mb-4">
-              <Title level={4}>Corrected Text</Title>
-              <Text type="secondary" className="block mb-2">
-                Hover over highlighted text to see the original errors and
-                explanations
-              </Text>
-            </div>
+        <div className="md:col-span-2">
+          <div className="flex mb-4 gap-2">
+            <button
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                activeTab === "errors"
+                  ? "bg-primary-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => setActiveTab("errors")}
+            >
+              Errors Found
+            </button>
+            <button
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                activeTab === "corrected"
+                  ? "bg-primary-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => setActiveTab("corrected")}
+            >
+              Corrected Text
+            </button>
+          </div>
 
-            <div className="whitespace-pre-wrap font-mono bg-white text-gray-800 p-4 rounded-lg border border-gray-200">
-              {(results as any).corrections.map(
-                (correction: Correction, index: number) => {
-                  if (correction.type === "error" && correction.corrected) {
-                    return (
-                      <AntTooltip
-                        key={index}
-                        title={
-                          <div>
-                            <div>
-                              <strong>Original:</strong> {correction.original}
-                            </div>
-                            <div>
-                              <strong>Error:</strong> {correction.explanation}
-                            </div>
-                          </div>
-                        }
-                        color="#ffffff"
-                        overlayInnerStyle={{ color: '#1f2937' }}
-                      >
-                        <span className="bg-green-100 text-green-800 px-1 rounded cursor-help">
-                          {correction.corrected}
-                        </span>
-                      </AntTooltip>
-                    );
-                  }
-                  return <span key={index}>{correction.text}</span>;
-                }
+          {activeTab === "errors" ? (
+            <div className="space-y-1">
+              {renderErrorCategory(
+                results.spelling,
+                "Spelling",
+                "bg-red-500"
+              )}
+              {renderErrorCategory(
+                results.punctuation,
+                "Punctuation",
+                "bg-blue-500"
+              )}
+              {renderErrorCategory(
+                results.grammar,
+                "Grammar",
+                "bg-yellow-500"
               )}
             </div>
-          </Card>
-        )}
-
-      {(results as any).summary && (results as any).summary.length > 0 && (
-        <Card>
-          <Title level={4}>Summary</Title>
-          <ul className="list-disc pl-6">
-            {(results as any).summary.map((item: string, index: number) => (
-              <li key={index} className="mb-2">
-                <Text>{item}</Text>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
-
-      <div className="mb-3">
-        <div className="border-b border-gray-200">
-          <ul className="flex -mb-px">
-            <li className="mr-2">
-              <button
-                className={`tab-transition inline-block p-4 ${
-                  activeTab === "errors" ? "tab-active" : "tab-inactive"
-                }`}
-                onClick={() => setActiveTab("errors")}
-              >
-                Detected Errors
-              </button>
-            </li>
-            {results.corrected_text && (
-              <li className="mr-2">
-                <button
-                  className={`tab-transition inline-block p-4 ${
-                    activeTab === "corrected" ? "tab-active" : "tab-inactive"
-                  }`}
-                  onClick={() => setActiveTab("corrected")}
-                >
-                  Corrected Text
-                </button>
-              </li>
-            )}
-          </ul>
-        </div>
-
-        {activeTab === "errors" && (
-          <div className="mt-4">
-            {renderErrorCategory(
-              results.spelling,
-              "Spelling",
-              "bg-red-600 text-white"
-            )}
-            {renderErrorCategory(
-              results.punctuation,
-              "Punctuation",
-              "bg-blue-600 text-white"
-            )}
-            {renderErrorCategory(
-              results.grammar,
-              "Grammar",
-              "bg-yellow-500 text-white"
-            )}
-          </div>
-        )}
-
-        {activeTab === "corrected" && results.corrected_text && (
-          <div className="mt-4 rounded-lg overflow-hidden shadow-md">
-            <div className="bg-green-600 text-white p-3">
-              <h5 className="mb-0">Corrected Text</h5>
-              <p className="text-green-100 text-sm mb-0 mt-1">
-                <i>
-                  Hover over corrections to see original errors and explanations
-                </i>
-              </p>
-            </div>
-            <div className="p-4 bg-white">
-              <div className="border p-3 rounded bg-gray-900 corrected-text-container">
-                <p className="mb-2 text-sm text-gray-400">
-                  <span className="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded mr-2">
-                    Tip
-                  </span>
-                  Hover over highlighted text to see the original errors and
-                  explanations.
-                </p>
+          ) : (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="p-4 bg-primary-700 text-white">
+                <h5 className="m-0 font-medium">Corrected Text</h5>
+              </div>
+              <div className="p-0">
                 {processHighlightedText(results)}
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

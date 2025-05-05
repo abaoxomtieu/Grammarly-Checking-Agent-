@@ -1,6 +1,6 @@
 import React, { useState, KeyboardEvent } from "react";
-import { Tabs, Input, Button, message } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
+import { Tabs, Input, Button, message, Tooltip } from "antd";
+import { LoadingOutlined, ClearOutlined, CopyOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import type { TabsProps } from "antd";
 import GrammarQuiz from "./GrammarQuiz";
 
@@ -38,6 +38,16 @@ const GrammarForm: React.FC<GrammarFormProps> = ({
       proper_nouns: properNouns.trim(),
     };
     onSubmit(payload, "text");
+  };
+
+  const handleClearText = () => {
+    setText("");
+    message.info("Text cleared");
+  };
+
+  const handleCopyText = () => {
+    navigator.clipboard.writeText(text);
+    message.success("Text copied to clipboard");
   };
 
   const handleFileSubmit = (e: React.FormEvent) => {
@@ -88,47 +98,84 @@ const GrammarForm: React.FC<GrammarFormProps> = ({
       key: "text",
       label: "Text Input",
       children: (
-        <form onSubmit={handleTextSubmit} className="space-y-6">
+        <form onSubmit={handleTextSubmit} className="space-y-8">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Enter your text
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Enter your text
+              </label>
+              <div className="flex space-x-2">
+                <Tooltip title="Copy text">
+                  <Button 
+                    type="text" 
+                    size="small" 
+                    icon={<CopyOutlined />} 
+                    onClick={handleCopyText} 
+                    disabled={!text}
+                    className="text-gray-500 hover:text-primary-600"
+                  />
+                </Tooltip>
+                <Tooltip title="Clear text">
+                  <Button 
+                    type="text" 
+                    size="small" 
+                    icon={<ClearOutlined />} 
+                    onClick={handleClearText} 
+                    disabled={!text}
+                    className="text-gray-500 hover:text-primary-600"
+                  />
+                </Tooltip>
+              </div>
+            </div>
             <TextArea
               rows={8}
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Paste your text here for grammar checking... (Press Enter to submit)"
+              placeholder="Enter or paste your text here..."
               disabled={loading}
-              className="w-full"
+              className="w-full rounded-xl border-gray-300 focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 transition-all"
+              autoSize={{ minRows: 8, maxRows: 12 }}
             />
+            <p className="mt-1 text-sm text-gray-500">
+              Press Enter to submit
+            </p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Technical Terms/Proper Nouns (optional)
-            </label>
+          <div className="relative">
+            <div className="flex justify-between items-center mb-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                Technical Terms/Proper Nouns
+                <Tooltip title="Terms entered here will be preserved in their original form during checking">
+                  <InfoCircleOutlined className="ml-1 text-gray-400" />
+                </Tooltip>
+              </label>
+              <span className="text-xs text-gray-500">Optional</span>
+            </div>
             <Input
               value={properNouns}
               onChange={(e) => setProperNouns(e.target.value)}
               placeholder="Enter technical terms or proper nouns separated by commas (e.g., GraphQL, React, Python)"
               disabled={loading}
-              className="w-full"
+              className="w-full rounded-xl border-gray-300 focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 transition-all"
             />
             <p className="mt-1 text-sm text-gray-500">
               These terms will be preserved in their original form.
             </p>
           </div>
 
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            disabled={!text.trim()}
-            className="w-full md:w-auto"
-          >
-            {loading ? "Checking..." : "Check Grammar"}
-          </Button>
+          <div className="flex justify-center pt-2">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              disabled={!text.trim()}
+              className="h-12 px-8 text-base font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-300 w-full md:w-auto"
+              icon={loading ? <LoadingOutlined /> : undefined}
+            >
+              {loading ? "Checking..." : "Check Grammar"}
+            </Button>
+          </div>
         </form>
       ),
     },
@@ -136,12 +183,14 @@ const GrammarForm: React.FC<GrammarFormProps> = ({
       key: "file",
       label: "File Upload",
       children: (
-        <form onSubmit={handleFileSubmit} className="space-y-6">
+        <form onSubmit={handleFileSubmit} className="space-y-8">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Upload a document (.txt, .docx)
-            </label>
-            <div className="flex items-center space-x-2">
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Upload a document (.txt, .docx)
+              </label>
+            </div>
+            <div className="flex items-center space-x-2 p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300 hover:bg-gray-100 transition-colors duration-200">
               <input
                 type="file"
                 accept=".txt,.docx"
@@ -149,13 +198,13 @@ const GrammarForm: React.FC<GrammarFormProps> = ({
                 disabled={loading}
                 className="block w-full text-sm text-gray-500
                   file:mr-4 file:py-2 file:px-4
-                  file:rounded-md file:border-0
+                  file:rounded-lg file:border-0
                   file:text-sm file:font-semibold
-                  file:bg-blue-50 file:text-blue-700
-                  hover:file:bg-blue-100"
+                  file:bg-primary-100 file:text-primary-700
+                  hover:file:bg-primary-200 transition-colors"
               />
               {file && (
-                <span className="text-sm text-gray-600">{file.name}</span>
+                <span className="text-sm text-gray-600 font-medium">{file.name}</span>
               )}
             </div>
             <p className="mt-1 text-sm text-gray-500">
@@ -164,31 +213,39 @@ const GrammarForm: React.FC<GrammarFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Technical Terms/Proper Nouns (optional)
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                Technical Terms/Proper Nouns
+                <Tooltip title="Terms entered here will be preserved in their original form during checking">
+                  <InfoCircleOutlined className="ml-1 text-gray-400" />
+                </Tooltip>
+              </label>
+              <span className="text-xs text-gray-500">Optional</span>
+            </div>
             <Input
               value={properNouns}
               onChange={(e) => setProperNouns(e.target.value)}
               placeholder="Enter technical terms or proper nouns separated by commas (e.g., GraphQL, React, Python)"
               disabled={loading}
-              className="w-full"
+              className="w-full rounded-xl border-gray-300 focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 transition-all"
             />
             <p className="mt-1 text-sm text-gray-500">
               These terms will be preserved in their original form.
             </p>
           </div>
 
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            disabled={!file}
-            icon={loading ? <LoadingOutlined /> : undefined}
-            className="w-full md:w-auto"
-          >
-            {loading ? "Uploading & Checking..." : "Check Grammar"}
-          </Button>
+          <div className="flex justify-center pt-2">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              disabled={!file}
+              icon={loading ? <LoadingOutlined /> : undefined}
+              className="h-12 px-8 text-base font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-300 w-full md:w-auto"
+            >
+              {loading ? "Uploading & Checking..." : "Check Grammar"}
+            </Button>
+          </div>
         </form>
       ),
     },
@@ -205,6 +262,12 @@ const GrammarForm: React.FC<GrammarFormProps> = ({
       items={items}
       onChange={setActiveTab}
       className="grammar-tabs"
+      type="card"
+      size="large"
+      tabBarStyle={{
+        marginBottom: 24,
+        borderBottom: "1px solid #e5e7eb",
+      }}
     />
   );
 };
